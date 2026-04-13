@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYDRA Care — Family Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #1C2B3A;
+  --navy2:  #243447;
+  --sage:   #5C7A5F;
+  --sage-l: #E8F0E8;
+  --sage-m: #B8CEB9;
+  --gold:   #C9A84C;
+  --gold-l: #FBF5E6;
+  --rust:   #C4622D;
+  --rust-l: #F5EAE3;
+  --cream:  #F7F2EB;
+  --warm:   #EDE8E0;
+  --muted:  #8A7F75;
+  --text:   #2C2420;
+  --white:  #FFFFFF;
+  --sidebar-w: 240px;
+  --header-h: 64px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── LAYOUT ─────────────────────────────── */
+.app { display:flex; min-height:100vh; }
+
+/* ── SIDEBAR ────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top:0; left:0; bottom:0;
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-logo svg { display:block; }
+
+.sidebar-senior {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.senior-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 10px;
+}
+.senior-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+.senior-card:hover { background: rgba(255,255,255,0.06); }
+.senior-avatar {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--sage) 0%, #3d5e40 100%);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 15px; font-weight: 600; color: white;
+  flex-shrink: 0;
+}
+.senior-info h4 { font-size: 13px; font-weight: 600; color: white; }
+.senior-info p { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 1px; }
+.senior-status {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #4CAF50;
+  box-shadow: 0 0 6px #4CAF50;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-nav { padding: 16px 12px; flex:1; }
+.nav-section-label {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  padding: 4px 8px 8px;
+  margin-top: 8px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 2px;
+  position: relative;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); }
+.nav-item.active { background: var(--sage); }
+.nav-item.active .nav-label { color: white; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-icon { font-size: 16px; opacity: 0.5; width: 20px; text-align:center; }
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-label { font-size: 13px; font-weight: 400; color: rgba(255,255,255,0.6); }
+.nav-badge {
+  margin-left: auto;
+  background: var(--rust);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-bottom {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+}
+.user-chip-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display:flex; align-items:center; justify-content:center;
+  font-size: 13px; color: rgba(255,255,255,0.7);
+}
+.user-chip-info { flex:1; }
+.user-chip-info h5 { font-size: 12px; color: rgba(255,255,255,0.8); font-weight: 500; }
+.user-chip-info p { font-size: 10px; color: rgba(255,255,255,0.35); }
+
+/* ── MAIN CONTENT ──────────────────────── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.topbar {
+  height: var(--header-h);
+  background: white;
+  border-bottom: 1px solid var(--warm);
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  position: sticky;
+  top: 0; z-index: 50;
+}
+.topbar-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  color: var(--navy);
+  font-weight: 400;
+  flex: 1;
+}
+.topbar-title span { color: var(--sage); font-style: italic; }
+
+.topbar-actions { display:flex; align-items:center; gap:12px; }
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--warm);
+  background: white;
+  display: flex; align-items:center; justify-content:center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  position: relative;
+}
+.icon-btn:hover { background: var(--cream); border-color: var(--sage-m); }
+.icon-btn .dot {
+  position: absolute; top:6px; right:6px;
+  width:7px; height:7px; border-radius:50%;
+  background: var(--rust);
+  border: 1.5px solid white;
+}
+
+.btn-primary {
+  background: var(--sage);
+  color: white;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex; align-items:center; gap:6px;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: #4d6950; transform: translateY(-1px); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--warm);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-ghost:hover { border-color: var(--sage-m); color: var(--sage); background: var(--sage-l); }
+
+/* ── PAGE CONTENT ──────────────────────── */
+.page { display: none; padding: 28px 32px; animation: fadeUp 0.3s ease; }
+.page.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(10px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ── SECTION HEADER ────────────────────── */
+.section-hd {
+  display: flex; align-items:center; justify-content:space-between;
+  margin-bottom: 20px;
+}
+.section-hd h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 400; color: var(--navy);
+}
+.section-hd h2 em { color: var(--sage); font-style: italic; }
+.section-hd p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ── STAT CARDS ────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid var(--warm);
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top:0; left:0; right:0;
+  height: 3px;
+}
+.stat-card.green::before { background: var(--sage); }
+.stat-card.gold::before { background: var(--gold); }
+.stat-card.rust::before { background: var(--rust); }
+.stat-card.navy::before { background: var(--navy); }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+
+.stat-icon { font-size: 22px; margin-bottom: 12px; }
+.stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 34px; color: var(--navy); font-weight: 400;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label { font-size: 12px; color: var(--muted); }
+.stat-trend {
+  font-size: 11px; font-weight: 500; margin-top: 8px;
+  display: flex; align-items:center; gap:4px;
+}
+.stat-trend.up { color: var(--sage); }
+.stat-trend.warn { color: var(--rust); }
+
+/* ── CONTENT GRID ──────────────────────── */
+.content-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+.content-grid.wide { grid-template-columns: 1fr; }
+
+/* ── CARD ──────────────────────────────── */
+.card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--warm);
+  overflow: hidden;
+}
+.card-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--warm);
+  display: flex; align-items:center; justify-content:space-between;
+}
+.card-head h3 { font-size: 14px; font-weight: 600; color: var(--navy); }
+.card-head p { font-size: 11px; color: var(--muted); margin-top:2px; }
+.card-body { padding: 16px 20px; }
+
+/* ── TIMELINE ──────────────────────────── */
+.timeline { display:flex; flex-direction:column; gap:0; }
+.tl-item {
+  display: flex; gap: 14px; padding: 10px 0;
+  border-bottom: 1px solid var(--warm);
+  animation: fadeUp 0.4s ease both;
+}
+.tl-item:last-child { border-bottom: none; }
+.tl-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 15px; flex-shrink: 0; margin-top: 2px;
+}
+.tl-dot.green { background: var(--sage-l); }
+.tl-dot.gold  { background: var(--gold-l); }
+.tl-dot.rust  { background: var(--rust-l); }
+.tl-dot.navy  { background: #e8ecf0; }
+.tl-content { flex:1; }
+.tl-content h4 { font-size: 13px; font-weight: 500; color: var(--navy); }
+.tl-content p  { font-size: 12px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.tl-time { font-size: 11px; color: var(--muted); white-space: nowrap; margin-top: 4px; }
+
+/* ── ALERT ITEMS ───────────────────────── */
+.alert-list { display:flex; flex-direction:column; gap:10px; }
+.alert-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.alert-item:hover { transform: translateX(3px); }
+.alert-item.critical { background: var(--rust-l); border-color: #f0c4b0; }
+.alert-item.warning  { background: var(--gold-l); border-color: #ead8a0; }
+.alert-item.info     { background: var(--sage-l); border-color: var(--sage-m); }
+.alert-icon { font-size: 18px; margin-top: 1px; flex-shrink:0; }
+.alert-content h4 { font-size: 13px; font-weight: 600; }
+.alert-content p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.alert-item.critical h4 { color: var(--rust); }
+.alert-item.warning  h4 { color: #8B6914; }
+.alert-item.info     h4 { color: var(--sage); }
+.alert-time { font-size: 10px; color: var(--muted); margin-left: auto; white-space: nowrap; padding-top: 2px; }
+
+/* ── MED TRACKER ───────────────────────── */
+.med-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--warm);
+}
+.med-row:last-child { border-bottom: none; }
+.med-name { flex:1; }
+.med-name h4 { font-size: 13px; font-weight: 500; color: var(--navy); }
+.med-name p  { font-size: 11px; color: var(--muted); }
+.med-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px; font-weight: 600;
+}
+.med-status.taken { background: var(--sage-l); color: var(--sage); }
+.med-status.missed { background: var(--rust-l); color: var(--rust); }
+.med-status.pending { background: var(--gold-l); color: #8B6914; }
+.med-time { font-size: 11px; color: var(--muted); min-width: 50px; text-align:right; }
+
+/* ── MOOD CHART ────────────────────────── */
+.mood-track {
+  display: flex; gap: 6px; align-items: flex-end;
+  height: 60px; padding: 0 4px;
+}
+.mood-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+.mood-bar {
+  width: 100%; border-radius: 4px 4px 0 0;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+.mood-bar.great { background: var(--sage); }
+.mood-bar.good  { background: var(--sage-m); }
+.mood-bar.low   { background: var(--gold); }
+.mood-bar.sad   { background: var(--rust); }
+.mood-day { font-size: 9px; color: var(--muted); }
+
+/* ── QR SECTION ────────────────────────── */
+.qr-card {
+  background: var(--navy);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex; align-items: center; gap: 24px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.qr-card::before {
+  content:'';
+  position:absolute; top:-60px; right:-60px;
+  width:200px; height:200px; border-radius:50%;
+  background: radial-gradient(circle, rgba(92,122,95,0.3) 0%, transparent 70%);
+}
+.qr-placeholder {
+  width: 90px; height: 90px;
+  background: white;
+  border-radius: 12px;
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  position: relative; z-index:1;
+}
+.qr-info { flex:1; position: relative; z-index:1; }
+.qr-info h3 { color:white; font-size:16px; font-weight:600; margin-bottom:6px; }
+.qr-info p  { color:rgba(255,255,255,0.55); font-size:12px; line-height:1.5; margin-bottom:14px; }
+.qr-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.qr-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px; font-weight:500;
+  cursor: pointer; border:none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s;
+}
+.qr-btn.primary { background: var(--gold); color: var(--navy); }
+.qr-btn.ghost   { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+.qr-btn:hover   { transform: translateY(-1px); }
+
+/* ── FAMILY MEMBERS ────────────────────── */
+.family-grid { display:grid; grid-template-columns: repeat(3,1fr); gap:12px; }
+.family-member {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--warm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.family-member:hover { border-color: var(--sage-m); background: var(--sage-l); }
+.fm-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  margin: 0 auto 8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 16px; font-weight:600; color:white;
+}
+.fm-name { font-size: 12px; font-weight:600; color:var(--navy); }
+.fm-rel  { font-size: 10px; color:var(--muted); margin-top:2px; }
+.fm-joined { font-size: 10px; color:var(--sage); margin-top:4px; }
+
+/* ── VOICE SESSION ─────────────────────── */
+.voice-session {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.voice-session::after {
+  content:'';
+  position:absolute; bottom:-40px; right:-40px;
+  width:160px; height:160px; border-radius:50%;
+  background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
+}
+.vs-label { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:8px; }
+.vs-quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px; font-style:italic;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.5;
+  margin-bottom: 14px;
+  max-width: 360px;
+}
+.vs-meta { display:flex; gap:16px; flex-wrap:wrap; }
+.vs-tag {
+  display:flex; align-items:center; gap:6px;
+  font-size: 12px; color: rgba(255,255,255,0.55);
+}
+.vs-tag span { color: var(--gold); font-weight:500; }
+
+/* ── HEALTH BARS ───────────────────────── */
+.health-metric { margin-bottom: 14px; }
+.hm-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:5px; }
+.hm-label { font-size: 12px; color: var(--muted); }
+.hm-val { font-size: 12px; font-weight:600; color:var(--navy); }
+.hm-bar { height: 6px; background: var(--warm); border-radius: 3px; overflow:hidden; }
+.hm-fill { height:100%; border-radius:3px; transition: width 1s ease; }
+.hm-fill.green { background: var(--sage); }
+.hm-fill.gold  { background: var(--gold); }
+.hm-fill.rust  { background: var(--rust); }
+
+/* ── CALL INTERFACE ────────────────────── */
+.call-strip {
+  display: flex; align-items:center; gap:12px;
+  background: var(--sage-l);
+  border: 1px solid var(--sage-m);
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.call-strip:hover { background: #dce9dc; }
+.call-strip .call-icon { font-size: 22px; }
+.call-strip .call-info { flex:1; }
+.call-strip .call-info h4 { font-size:13px; font-weight:600; color:var(--sage); }
+.call-strip .call-info p  { font-size:11px; color:var(--muted); }
+.call-strip .call-cta { font-size:12px; font-weight:600; color:var(--sage); }
+
+/* ── MODAL ─────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset:0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  display: none; align-items:center; justify-content:center;
+  animation: fadeIn 0.2s ease;
+}
+.modal-overlay.open { display:flex; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 440px; width: 90%;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+.modal h3 { font-family:'Cormorant Garamond',serif; font-size:24px; color:var(--navy); margin-bottom:8px; }
+.modal p  { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:20px; }
+.modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+
+/* ── TOAST ─────────────────────────────── */
+.toast {
+  position: fixed; bottom:24px; right:24px;
+  background: var(--navy);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 13px;
+  display: flex; align-items:center; gap:10px;
+  z-index: 300;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  max-width: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+.toast.show { transform:translateY(0); opacity:1; }
+.toast-icon { font-size:18px; flex-shrink:0; }
+
+/* ── SOS BUTTON ────────────────────────── */
+.sos-trigger {
+  background: var(--rust);
+  color: white; border:none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight:600;
+  cursor: pointer;
+  display:flex; align-items:center; gap:6px;
+  transition: all 0.2s;
+  animation: pulse-rust 2s infinite;
+}
+@keyframes pulse-rust {
+  0%,100% { box-shadow: 0 0 0 0 rgba(196,98,45,0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(196,98,45,0); }
+}
+
+/* ── CHIP ──────────────────────────────── */
+.chip {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:4px 10px; border-radius:20px;
+  font-size:11px; font-weight:500;
+}
+.chip.green { background:var(--sage-l); color:var(--sage); }
+.chip.gold  { background:var(--gold-l); color:#8B6914; }
+.chip.rust  { background:var(--rust-l); color:var(--rust); }
+.chip.navy  { background:#e8ecf0; color:var(--navy); }
+
+/* ── EMPTY STATE ───────────────────────── */
+.empty { text-align:center; padding:40px 20px; color:var(--muted); }
+.empty .empty-icon { font-size:40px; margin-bottom:12px; opacity:0.4; }
+.empty p { font-size:13px; line-height:1.6; }
+
+/* ── SCROLL ────────────────────────────── */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--warm); border-radius:10px; }
+
+.page { max-height: calc(100vh - var(--header-h)); overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="148" height="42" viewBox="0 0 148 42" fill="none">
+        <rect x="4" y="4" width="5" height="28" fill="#5C7A5F"/>
+        <rect x="4" y="28" width="22" height="5" fill="#5C7A5F"/>
+        <path d="M 6.5 19 Q 6.5 8 15 8 Q 23.5 8 23.5 19" stroke="#C9A84C" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <circle cx="15" cy="6.5" r="3.5" fill="#C9A84C"/>
+        <text x="36" y="21" font-family="'DM Sans',sans-serif" font-size="17" font-weight="600" fill="#F7F2EB" letter-spacing="2">LYDRA</text>
+        <line x1="36" y1="25" x2="144" y2="25" stroke="#5C7A5F" stroke-width="0.6" opacity="0.5"/>
+        <text x="37" y="36" font-family="Georgia,serif" font-size="10" fill="#5C7A5F" letter-spacing="8" font-style="italic">care</text>
+      </svg>
+    </div>
+
+    <div class="sidebar-senior">
+      <div class="senior-label">Monitoring</div>
+      <div class="senior-card" onclick="showToast('👴 Switching senior profile…')">
+        <div class="senior-avatar">MK</div>
+        <div class="senior-info">
+          <h4>Muhammad Khan</h4>
+          <p>Father · 78 yrs · Calgary</p>
+        </div>
+        <div class="senior-status"></div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <div class="nav-item active" onclick="navigate('dashboard', this)">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="navigate('activity', this)">
+        <span class="nav-icon">📋</span>
+        <span class="nav-label">Activity Log</span>
+      </div>
+      <div class="nav-item" onclick="navigate('medications', this)">
+        <span class="nav-icon">💊</span>
+        <span class="nav-label">Medications</span>
+        <span class="nav-badge">1</span>
+      </div>
+      <div class="nav-item" onclick="navigate('alerts', this)">
+        <span class="nav-icon">🔔</span>
+        <span class="nav-label">Alerts</span>
+        <span class="nav-badge">2</span>
+      </div>
+
+      <div class="nav-section-label">Connection</div>
+      <div class="nav-item" onclick="navigate('family', this)">
+        <span class="nav-icon">👨‍👩‍👧</span>
+        <span class="nav-label">Family Circle</span>
+      </div>
+      <div class="nav-item" onclick="navigate('messages', this)">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">Voice Messages</span>
+      </div>
+
+      <div class="nav-section-label">Insights</div>
+      <div class="nav-item" onclick="navigate('health', this)">
+        <span class="nav-icon">❤️</span>
+        <span class="nav-label">Health Insights</span>
+      </div>
+      <div class="nav-item" onclick="navigate('settings', this)">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="user-chip-avatar">👤</div>
+        <div class="user-chip-info">
+          <h5>Tariq Khan</h5>
+          <p>Son · Primary caregiver</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN ═══════════ -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Good morning, <span>Tariq</span> 👋</div>
+      <div class="topbar-actions">
+        <button class="sos-trigger" onclick="openSOS()">🚨 SOS</button>
+        <div class="icon-btn" onclick="showToast('📞 Starting video call with Muhammad…')">📞</div>
+        <div class="icon-btn" onclick="navigate('alerts', document.querySelector('[onclick*=alerts]'))">
+          🔔<div class="dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: DASHBOARD ═══ -->
+    <div class="page active" id="page-dashboard">
+
+      <!-- Today's summary banner -->
+      <div class="voice-session" style="margin-bottom:20px;">
+        <div class="vs-label">Today's Morning Check-in · 8:14 AM</div>
+        <div class="vs-quote">"Good morning! I had a good sleep. My knee is a little sore but I feel fine. Did you see the hockey game last night?"</div>
+        <div class="vs-meta">
+          <div class="vs-tag">😊 Mood: <span>Good</span></div>
+          <div class="vs-tag">🗣️ Duration: <span>4m 12s</span></div>
+          <div class="vs-tag">💊 Meds: <span>Confirmed ✓</span></div>
+          <div class="vs-tag">🧠 Cognition: <span>Normal</span></div>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">💊</div>
+          <div class="stat-val">94%</div>
+          <div class="stat-label">Medication adherence this month</div>
+          <div class="stat-trend up">↑ Up from 88% last month</div>
+        </div>
+        <div class="stat-card gold">
+          <div class="stat-icon">🗣️</div>
+          <div class="stat-val">14</div>
+          <div class="stat-label">Check-in streak (days)</div>
+          <div class="stat-trend up">↑ Longest streak yet</div>
+        </div>
+        <div class="stat-card rust">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-val">2</div>
+          <div class="stat-label">Unread alerts today</div>
+          <div class="stat-trend warn">Needs your attention</div>
+        </div>
+        <div class="stat-card navy">
+          <div class="stat-icon">👨‍👩‍👧</div>
+          <div class="stat-val">4</div>
+          <div class="stat-label">Family members connected</div>
+          <div class="stat-trend up">✓ All active this week</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <!-- LEFT -->
+        <div>
+          <!-- Today's timeline -->
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-head">
+              <div><h3>Today's Activity</h3><p>Sunday, March 29 · All events</p></div>
+              <button class="btn-ghost" onclick="navigate('activity', document.querySelector('[onclick*=activity]'))">See all</button>
+            </div>
+            <div class="card-body">
+              <div class="timeline">
+                <div class="tl-item">
+                  <div class="tl-dot green">🌅</div>
+                  <div class="tl-content">
+                    <h4>Morning check-in completed</h4>
+                    <p>4 min 12 sec session. Mood: good. Mentioned knee soreness. Meds confirmed.</p>
+                  </div>
+                  <div class="tl-time">8:14 AM</div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot green">💊</div>
+                  <div class="tl-content">
+                    <h4>Medication confirmed — Metformin 500mg</h4>
+                    <p>Verbally confirmed during check-in. Logged automatically.</p>
+                  </div>
+                  <div class="tl-time">8:16 AM</div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot gold">☕</div>
+                  <div class="tl-content">
+                    <h4>App activity — conversation mode</h4>
+                    <p>"Tell me about today's news" — 6 min session.</p>
+                  </div>
+                  <div class="tl-time">9:32 AM</div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot rust">⚠️</div>
+                  <div class="tl-content">
+                    <h4>Afternoon reminder missed</h4>
+                    <p>2:00 PM Lisinopril reminder — no response after 3 attempts.</p>
+                  </div>
+                  <div class="tl-time">2:24 PM</div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot navy">📞</div>
+                  <div class="tl-content">
+                    <h4>Video call — Sarah Khan (daughter)</h4>
+                    <p>11 min 40 sec call. Initiated by family.</p>
+                  </div>
+                  <div class="tl-time">4:05 PM</div>
+                </div>
+                <div class="tl-item">
+                  <div class="tl-dot green">🌙</div>
+                  <div class="tl-content">
+                    <h4>Evening check-in completed</h4>
+                    <p>2 min 8 sec session. Mood: relaxed. Night meds confirmed.</p>
+                  </div>
+                  <div class="tl-time">8:45 PM</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mood this week -->
+          <div class="card">
+            <div class="card-head">
+              <div><h3>Mood — Last 7 Days</h3><p>Based on voice tone analysis</p></div>
+              <span class="chip green">😊 Trending good</span>
+            </div>
+            <div class="card-body">
+              <div class="mood-track">
+                <div class="mood-bar-wrap"><div class="mood-bar great" style="height:70%"></div><div class="mood-day">Mon</div></div>
+                <div class="mood-bar-wrap"><div class="mood-bar great" style="height:80%"></div><div class="mood-day">Tue</div></div>
+                <div class="mood-bar-wrap"><div class="mood-bar good"  style="height:55%"></div><div class="mood-day">Wed</div></div>
+                <div class="mood-bar-wrap"><div class="mood-bar low"   style="height:35%"></div><div class="mood-day">Thu</div></div>
+                <div class="mood-bar-wrap"><div class="mood-bar great" style="height:75%"></div><div class="mood-day">Fri</div></div>
+                <div class="mood-bar-wrap"><div class="mood-bar great" style="height:85%"></div><div class="mood-day">Sat</div></div>
+                <div class="mood-bar-wrap"><div class="mood-bar great" style="height:72%"></div><div class="mood-day">Sun</div></div>
+              </div>
+              <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--sage)"></div>Great</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--sage-m)"></div>Good</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--gold)"></div>Low</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div style="width:10px;height:10px;border-radius:2px;background:var(--rust)"></div>Sad</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT -->
+        <div>
+          <!-- Alerts -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head">
+              <div><h3>Active Alerts</h3><p>Needs your attention</p></div>
+              <span class="chip rust">2 new</span>
+            </div>
+            <div class="card-body">
+              <div class="alert-list">
+                <div class="alert-item critical" onclick="showToast('📞 Calling Muhammad to check on medication…')">
+                  <div class="alert-icon">💊</div>
+                  <div class="alert-content">
+                    <h4>Missed medication</h4>
+                    <p>Lisinopril 2:00 PM — no response to 3 reminders</p>
+                  </div>
+                  <div class="alert-time">2:24 PM</div>
+                </div>
+                <div class="alert-item warning" onclick="showToast('🔍 Opening activity log…')">
+                  <div class="alert-icon">😐</div>
+                  <div class="alert-content">
+                    <h4>Lower mood detected</h4>
+                    <p>Thursday session showed signs of mild sadness</p>
+                  </div>
+                  <div class="alert-time">Yesterday</div>
+                </div>
+                <div class="alert-item info">
+                  <div class="alert-icon">✅</div>
+                  <div class="alert-content">
+                    <h4>Check-in streak: 14 days</h4>
+                    <p>Muhammad has checked in every day this month</p>
+                  </div>
+                  <div class="alert-time">Today</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Today's meds -->
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head">
+              <div><h3>Medications Today</h3></div>
+              <button class="btn-ghost" onclick="navigate('medications', document.querySelector('[onclick*=medications]'))">Manage</button>
+            </div>
+            <div class="card-body">
+              <div class="med-row">
+                <div class="med-name"><h4>Metformin 500mg</h4><p>Breakfast</p></div>
+                <span class="med-status taken">✓ Taken</span>
+                <span class="med-time">8:16 AM</span>
+              </div>
+              <div class="med-row">
+                <div class="med-name"><h4>Lisinopril 10mg</h4><p>Lunch</p></div>
+                <span class="med-status missed">✗ Missed</span>
+                <span class="med-time">2:00 PM</span>
+              </div>
+              <div class="med-row">
+                <div class="med-name"><h4>Aspirin 81mg</h4><p>Dinner</p></div>
+                <span class="med-status pending">⏳ Due</span>
+                <span class="med-time">7:00 PM</span>
+              </div>
+              <div class="med-row">
+                <div class="med-name"><h4>Atorvastatin 20mg</h4><p>Bedtime</p></div>
+                <span class="med-status pending">⏳ Due</span>
+                <span class="med-time">9:00 PM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick call -->
+          <div class="call-strip" onclick="showToast('📹 Starting video call with Muhammad…')">
+            <div class="call-icon">📹</div>
+            <div class="call-info">
+              <h4>Start video call</h4>
+              <p>Muhammad's app is active now</p>
+            </div>
+            <div class="call-cta">Call now →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: ACTIVITY ═══ -->
+    <div class="page" id="page-activity">
+      <div class="section-hd">
+        <div><h2>Activity <em>Log</em></h2><p>Complete history of Muhammad's daily interactions</p></div>
+        <button class="btn-ghost">↓ Export PDF</button>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <div><h3>All Sessions — March 2026</h3></div>
+          <span class="chip green">29 check-ins this month</span>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-dot green">🌅</div><div class="tl-content"><h4>Morning check-in — 4m 12s</h4><p>Mood: good. Mentioned knee pain. Confirmed Metformin. Talked about hockey.</p></div><div class="tl-time">Today 8:14 AM</div></div>
+            <div class="tl-item"><div class="tl-dot gold">☕</div><div class="tl-content"><h4>Companion mode — 6m 03s</h4><p>Requested news summary. Asked about Ramadan schedule.</p></div><div class="tl-time">Today 9:32 AM</div></div>
+            <div class="tl-item"><div class="tl-dot navy">📞</div><div class="tl-content"><h4>Video call — Sarah (11m 40s)</h4><p>Family-initiated. Muhammad appeared happy, laughing.</p></div><div class="tl-time">Today 4:05 PM</div></div>
+            <div class="tl-item"><div class="tl-dot green">🌙</div><div class="tl-content"><h4>Evening check-in — 2m 08s</h4><p>Mood: relaxed. Confirmed night meds. Plans to watch TV.</p></div><div class="tl-time">Today 8:45 PM</div></div>
+            <div class="tl-item"><div class="tl-dot green">🌅</div><div class="tl-content"><h4>Morning check-in — 3m 45s</h4><p>Mood: low. Mentioned missing Lahore. Reminded about doctor appt Friday.</p></div><div class="tl-time">Yesterday 8:08 AM</div></div>
+            <div class="tl-item"><div class="tl-dot rust">⚠️</div><div class="tl-content"><h4>Reminder escalated to family</h4><p>Lunch reminder unanswered for 25 minutes. Alert sent to Tariq.</p></div><div class="tl-time">Yesterday 1:28 PM</div></div>
+            <div class="tl-item"><div class="tl-dot green">🧠</div><div class="tl-content"><h4>Brain exercise — 8m 22s</h4><p>Word recall game. Score: 8/10. Improvement over last week.</p></div><div class="tl-time">Yesterday 3:15 PM</div></div>
+            <div class="tl-item"><div class="tl-dot gold">📖</div><div class="tl-content"><h4>Story session — 12m 01s</h4><p>Requested Islamic stories. 2 stories shared. Mood improved.</p></div><div class="tl-time">Sat 7:22 PM</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: MEDICATIONS ═══ -->
+    <div class="page" id="page-medications">
+      <div class="section-hd">
+        <div><h2>Medication <em>Manager</em></h2><p>Track, schedule, and monitor adherence</p></div>
+        <button class="btn-primary" onclick="showToast('➕ Opening add medication form…')">+ Add medication</button>
+      </div>
+
+      <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-val">94%</div><div class="stat-label">This month's adherence</div></div>
+        <div class="stat-card rust"><div class="stat-icon">❌</div><div class="stat-val">4</div><div class="stat-label">Missed this month</div></div>
+        <div class="stat-card gold"><div class="stat-icon">🔔</div><div class="stat-val">3</div><div class="stat-label">Active reminders today</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Active Medications</h3></div>
+        <div class="card-body">
+          <div class="med-row" style="padding:16px 0;">
+            <div class="med-name"><h4>Metformin 500mg</h4><p>Breakfast · For diabetes management</p></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="chip green">94% adherence</span>
+              <button class="btn-ghost" onclick="showToast('📝 Opening Metformin details…')">Edit</button>
+            </div>
+          </div>
+          <div class="med-row" style="padding:16px 0;">
+            <div class="med-name"><h4>Lisinopril 10mg</h4><p>Lunch · For blood pressure</p></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="chip rust">82% adherence</span>
+              <button class="btn-ghost" onclick="showToast('📝 Opening Lisinopril details…')">Edit</button>
+            </div>
+          </div>
+          <div class="med-row" style="padding:16px 0;">
+            <div class="med-name"><h4>Aspirin 81mg</h4><p>Dinner · Cardiac protection</p></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="chip green">98% adherence</span>
+              <button class="btn-ghost" onclick="showToast('📝 Opening Aspirin details…')">Edit</button>
+            </div>
+          </div>
+          <div class="med-row" style="padding:16px 0;">
+            <div class="med-name"><h4>Atorvastatin 20mg</h4><p>Bedtime · Cholesterol management</p></div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="chip green">96% adherence</span>
+              <button class="btn-ghost" onclick="showToast('📝 Opening Atorvastatin details…')">Edit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: ALERTS ═══ -->
+    <div class="page" id="page-alerts">
+      <div class="section-hd">
+        <div><h2>Alerts &amp; <em>Notifications</em></h2><p>All alerts requiring your attention</p></div>
+        <button class="btn-ghost" onclick="showToast('✅ All alerts marked as read')">Mark all read</button>
+      </div>
+      <div class="alert-list">
+        <div class="alert-item critical">
+          <div class="alert-icon">💊</div>
+          <div class="alert-content"><h4>Missed medication — Lisinopril 10mg</h4><p>2:00 PM reminder sent 3 times. No response. Muhammad may need a call.</p></div>
+          <div class="alert-time">2:24 PM today</div>
+        </div>
+        <div class="alert-item warning">
+          <div class="alert-icon">😐</div>
+          <div class="alert-content"><h4>Low mood detected — Thursday session</h4><p>Voice analysis detected sadness. Muhammad mentioned missing home (Lahore).</p></div>
+          <div class="alert-time">Yesterday</div>
+        </div>
+        <div class="alert-item info">
+          <div class="alert-icon">🎉</div>
+          <div class="alert-content"><h4>14-day check-in streak achieved</h4><p>Muhammad has had a morning check-in every day for 14 consecutive days.</p></div>
+          <div class="alert-time">Today</div>
+        </div>
+        <div class="alert-item info">
+          <div class="alert-icon">👨‍👩‍👧</div>
+          <div class="alert-content"><h4>New family member joined</h4><p>Amir Khan (grandson) joined Muhammad's care circle via QR code.</p></div>
+          <div class="alert-time">3 days ago</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: FAMILY ═══ -->
+    <div class="page" id="page-family">
+      <div class="section-hd">
+        <div><h2>Family <em>Circle</em></h2><p>Everyone connected to Muhammad's care</p></div>
+        <button class="btn-primary" onclick="openQR()">📲 Share QR Code</button>
+      </div>
+
+      <div class="qr-card">
+        <div class="qr-placeholder">
+          <!-- Simple QR placeholder SVG -->
+          <svg width="66" height="66" viewBox="0 0 66 66">
+            <rect x="4" y="4" width="26" height="26" rx="3" fill="none" stroke="#1C2B3A" stroke-width="2"/>
+            <rect x="10" y="10" width="14" height="14" rx="1" fill="#1C2B3A"/>
+            <rect x="36" y="4" width="26" height="26" rx="3" fill="none" stroke="#1C2B3A" stroke-width="2"/>
+            <rect x="42" y="10" width="14" height="14" rx="1" fill="#1C2B3A"/>
+            <rect x="4" y="36" width="26" height="26" rx="3" fill="none" stroke="#1C2B3A" stroke-width="2"/>
+            <rect x="10" y="42" width="14" height="14" rx="1" fill="#1C2B3A"/>
+            <rect x="36" y="36" width="6" height="6" fill="#1C2B3A"/>
+            <rect x="44" y="36" width="6" height="6" fill="#1C2B3A"/>
+            <rect x="52" y="36" width="10" height="6" fill="#1C2B3A"/>
+            <rect x="36" y="44" width="10" height="6" fill="#1C2B3A"/>
+            <rect x="50" y="44" width="12" height="6" fill="#1C2B3A"/>
+            <rect x="36" y="52" width="6" height="10" fill="#1C2B3A"/>
+            <rect x="46" y="52" width="16" height="6" fill="#1C2B3A"/>
+          </svg>
+        </div>
+        <div class="qr-info">
+          <h3>Muhammad's Care Circle QR</h3>
+          <p>Share this QR code with family members. They scan it once to instantly join the care circle — no signup needed until after scanning.</p>
+          <div class="qr-actions">
+            <button class="qr-btn primary" onclick="showToast('📥 QR Card PDF downloading…')">↓ Download PDF card</button>
+            <button class="qr-btn ghost" onclick="showToast('🔗 Link copied to clipboard!')">📋 Copy link</button>
+            <button class="qr-btn ghost" onclick="showToast('🔄 New QR code generated. Old code is now invalid.')">🔄 Regenerate</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-hd" style="margin-top:8px;">
+        <div><h2>Connected <em>Members</em></h2><p>4 people in Muhammad's care circle</p></div>
+      </div>
+      <div class="family-grid">
+        <div class="family-member" onclick="showToast('👤 Opening Tariq\'s profile…')">
+          <div class="fm-avatar" style="background:linear-gradient(135deg,#5C7A5F,#3d5e40)">TK</div>
+          <div class="fm-name">Tariq Khan</div>
+          <div class="fm-rel">Son · Primary caregiver</div>
+          <div class="fm-joined">👑 Account owner</div>
+        </div>
+        <div class="family-member" onclick="showToast('👤 Opening Sarah\'s profile…')">
+          <div class="fm-avatar" style="background:linear-gradient(135deg,#C9A84C,#a07e2a)">SK</div>
+          <div class="fm-name">Sarah Khan</div>
+          <div class="fm-rel">Daughter · Toronto</div>
+          <div class="fm-joined">✓ Joined 3 weeks ago</div>
+        </div>
+        <div class="family-member" onclick="showToast('👤 Opening Amir\'s profile…')">
+          <div class="fm-avatar" style="background:linear-gradient(135deg,#1C2B3A,#2d4459)">AK</div>
+          <div class="fm-name">Amir Khan</div>
+          <div class="fm-rel">Grandson · Calgary</div>
+          <div class="fm-joined">✓ Joined 3 days ago</div>
+        </div>
+        <div class="family-member" onclick="showToast('👤 Opening Dr. Malik\'s profile…')">
+          <div class="fm-avatar" style="background:linear-gradient(135deg,#C4622D,#9e4a20)">DM</div>
+          <div class="fm-name">Dr. R. Malik</div>
+          <div class="fm-rel">Physician · Read-only</div>
+          <div class="fm-joined">✓ Joined 1 month ago</div>
+        </div>
+        <div class="family-member" style="border:2px dashed var(--warm);background:transparent;" onclick="openQR()">
+          <div class="fm-avatar" style="background:var(--warm);color:var(--muted)">+</div>
+          <div class="fm-name" style="color:var(--muted)">Add member</div>
+          <div class="fm-rel">Share QR code</div>
+          <div class="fm-joined" style="color:var(--sage)">+ Invite →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: MESSAGES ═══ -->
+    <div class="page" id="page-messages">
+      <div class="section-hd">
+        <div><h2>Voice <em>Messages</em></h2><p>Recorded messages between family and Muhammad</p></div>
+        <button class="btn-primary" onclick="showToast('🎤 Opening voice recorder…')">🎤 Record message</button>
+      </div>
+      <div class="card">
+        <div class="card-body">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-dot navy">📩</div>
+              <div class="tl-content">
+                <h4>From Muhammad → Tariq</h4>
+                <p>"Beta, I had a good day. The weather is nice today. Don't forget to call your mother on Sunday."</p>
+                <div style="margin-top:8px;display:flex;gap:8px;">
+                  <button class="btn-ghost" style="padding:5px 14px;font-size:11px;" onclick="showToast('▶️ Playing message…')">▶ Play</button>
+                  <span class="chip navy">0:18</span>
+                </div>
+              </div>
+              <div class="tl-time">Today 6:30 PM</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot gold">📤</div>
+              <div class="tl-content">
+                <h4>From Tariq → Muhammad</h4>
+                <p>"Abba jee, I'll come by Saturday morning. I'm bringing halwa. The AI will remind you I'm coming Friday night."</p>
+                <div style="margin-top:8px;display:flex;gap:8px;">
+                  <button class="btn-ghost" style="padding:5px 14px;font-size:11px;" onclick="showToast('▶️ Playing message…')">▶ Play</button>
+                  <span class="chip navy">0:24</span>
+                </div>
+              </div>
+              <div class="tl-time">Yesterday 9:10 PM</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-dot green">📩</div>
+              <div class="tl-content">
+                <h4>From Sarah → Muhammad</h4>
+                <p>"Baba, I saw your activity today — so proud you haven't missed a single check-in this month! Love you."</p>
+                <div style="margin-top:8px;display:flex;gap:8px;">
+                  <button class="btn-ghost" style="padding:5px 14px;font-size:11px;" onclick="showToast('▶️ Playing message…')">▶ Play</button>
+                  <span class="chip navy">0:20</span>
+                </div>
+              </div>
+              <div class="tl-time">2 days ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: HEALTH ═══ -->
+    <div class="page" id="page-health">
+      <div class="section-hd">
+        <div><h2>Health <em>Insights</em></h2><p>Weekly summary · March 22–29, 2026</p></div>
+        <button class="btn-ghost" onclick="showToast('📊 Generating PDF report for Dr. Malik…')">📊 Send to doctor</button>
+      </div>
+      <div class="content-grid">
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-head"><h3>Wellness Indicators</h3><p>Based on voice sessions and activity patterns</p></div>
+            <div class="card-body">
+              <div class="health-metric">
+                <div class="hm-row"><span class="hm-label">Medication adherence</span><span class="hm-val">94%</span></div>
+                <div class="hm-bar"><div class="hm-fill green" style="width:94%"></div></div>
+              </div>
+              <div class="health-metric">
+                <div class="hm-row"><span class="hm-label">Check-in consistency</span><span class="hm-val">100%</span></div>
+                <div class="hm-bar"><div class="hm-fill green" style="width:100%"></div></div>
+              </div>
+              <div class="health-metric">
+                <div class="hm-row"><span class="hm-label">Average mood score</span><span class="hm-val">74%</span></div>
+                <div class="hm-bar"><div class="hm-fill green" style="width:74%"></div></div>
+              </div>
+              <div class="health-metric">
+                <div class="hm-row"><span class="hm-label">Social engagement</span><span class="hm-val">68%</span></div>
+                <div class="hm-bar"><div class="hm-fill gold" style="width:68%"></div></div>
+              </div>
+              <div class="health-metric">
+                <div class="hm-row"><span class="hm-label">Cognitive exercise completion</span><span class="hm-val">55%</span></div>
+                <div class="hm-bar"><div class="hm-fill gold" style="width:55%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>AI Weekly Summary</h3><p>Generated from this week's sessions</p></div>
+            <div class="card-body">
+              <div class="voice-session" style="margin:0;">
+                <div class="vs-label">LYDRA Care AI · Weekly Digest</div>
+                <div class="vs-quote">"Muhammad had a positive week overall. His medication adherence improved to 94% — up from 88% last month. One missed Lisinopril dose on Sunday afternoon. He expressed some homesickness on Thursday (mention of Lahore) which resolved by Friday. Family contact was strong — 3 video calls and 4 voice messages exchanged. Recommend following up on the knee pain he mentioned on Monday and Sunday."</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head"><h3>This Week at a Glance</h3></div>
+            <div class="card-body">
+              <div class="med-row"><div class="med-name"><h4>Total sessions</h4></div><strong>14</strong></div>
+              <div class="med-row"><div class="med-name"><h4>Avg session length</h4></div><strong>3m 42s</strong></div>
+              <div class="med-row"><div class="med-name"><h4>Meds taken on time</h4></div><strong>26 / 28</strong></div>
+              <div class="med-row"><div class="med-name"><h4>Video calls</h4></div><strong>3 calls</strong></div>
+              <div class="med-row"><div class="med-name"><h4>Brain exercises</h4></div><strong>4 sessions</strong></div>
+              <div class="med-row"><div class="med-name"><h4>Stories / companion</h4></div><strong>6 sessions</strong></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Upcoming</h3></div>
+            <div class="card-body">
+              <div class="tl-item" style="border:none;padding:8px 0">
+                <div class="tl-dot gold">🏥</div>
+                <div class="tl-content"><h4>Dr. Malik appointment</h4><p>Friday, April 3 · 10:30 AM</p></div>
+              </div>
+              <div class="tl-item" style="border:none;padding:8px 0">
+                <div class="tl-dot green">💊</div>
+                <div class="tl-content"><h4>Metformin refill due</h4><p>In 8 days</p></div>
+              </div>
+              <div class="tl-item" style="border:none;padding:8px 0;border-top:1px solid var(--warm)">
+                <div class="tl-dot navy">👨</div>
+                <div class="tl-content"><h4>Tariq visiting</h4><p>Saturday, April 5 · Morning</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PAGE: SETTINGS ═══ -->
+    <div class="page" id="page-settings">
+      <div class="section-hd">
+        <div><h2>App <em>Settings</em></h2><p>Configure LYDRA Care for Muhammad</p></div>
+      </div>
+      <div class="content-grid">
+        <div>
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-head"><h3>Senior Profile</h3></div>
+            <div class="card-body">
+              <div class="med-row"><div class="med-name"><h4>Full name</h4><p>Shown to AI for personalisation</p></div><span style="font-size:13px;color:var(--navy)">Muhammad Khan</span></div>
+              <div class="med-row"><div class="med-name"><h4>Age</h4></div><span style="font-size:13px;color:var(--navy)">78 years</span></div>
+              <div class="med-row"><div class="med-name"><h4>Language</h4></div><span class="chip green">English</span></div>
+              <div class="med-row"><div class="med-name"><h4>Check-in time (AM)</h4></div><span style="font-size:13px;color:var(--navy)">8:00 AM</span></div>
+              <div class="med-row"><div class="med-name"><h4>Voice speed</h4></div><span class="chip navy">Slower (0.85×)</span></div>
+              <div style="margin-top:16px;">
+                <button class="btn-primary" onclick="showToast('💾 Profile saved successfully')">Save changes</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Notification Preferences</h3></div>
+            <div class="card-body">
+              <div class="med-row"><div class="med-name"><h4>Missed medication alerts</h4></div><span class="chip green">✓ On</span></div>
+              <div class="med-row"><div class="med-name"><h4>Mood change alerts</h4></div><span class="chip green">✓ On</span></div>
+              <div class="med-row"><div class="med-name"><h4>Daily digest email</h4></div><span class="chip green">✓ On</span></div>
+              <div class="med-row"><div class="med-name"><h4>SOS push notification</h4></div><span class="chip green">✓ On (immediate)</span></div>
+              <div class="med-row"><div class="med-name"><h4>Weekly health report</h4></div><span class="chip navy">Every Sunday</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-head"><h3>Remote App Controls</h3></div>
+            <div class="card-body">
+              <div class="alert-item info" style="margin-bottom:8px;cursor:pointer" onclick="showToast('🔄 Restart command sent to Muhammad\'s phone…')">
+                <div class="alert-icon">🔄</div>
+                <div class="alert-content"><h4>Restart app remotely</h4><p>If app is frozen or unresponsive</p></div>
+              </div>
+              <div class="alert-item info" style="margin-bottom:8px;cursor:pointer" onclick="showToast('🔔 Permission repair prompt sent to Muhammad\'s phone…')">
+                <div class="alert-icon">🔧</div>
+                <div class="alert-content"><h4>Fix permissions</h4><p>Microphone or notifications issue</p></div>
+              </div>
+              <div class="alert-item warning" style="cursor:pointer" onclick="showToast('📲 App update sent to Muhammad\'s phone…')">
+                <div class="alert-icon">📲</div>
+                <div class="alert-content"><h4>Push app update</h4><p>Latest version available</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Subscription</h3></div>
+            <div class="card-body">
+              <div class="med-row"><div class="med-name"><h4>Plan</h4></div><span class="chip green">Companion — $29/mo</span></div>
+              <div class="med-row"><div class="med-name"><h4>Next billing</h4></div><span style="font-size:13px;color:var(--muted)">April 1, 2026</span></div>
+              <div class="med-row"><div class="med-name"><h4>Trial ends</h4></div><span class="chip navy">Active subscriber</span></div>
+              <div style="margin-top:16px;display:flex;gap:8px;">
+                <button class="btn-ghost" onclick="showToast('💳 Opening billing portal…')">Manage billing</button>
+                <button class="btn-ghost" onclick="showToast('📋 Opening plan comparison…')">Upgrade to Clinical</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- SOS Modal -->
+<div class="modal-overlay" id="sosModal">
+  <div class="modal">
+    <h3>🚨 SOS — Emergency Protocol</h3>
+    <p>This will immediately call Muhammad's phone, send your location to all family members, and if no response within 60 seconds, notify emergency contacts.</p>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeModal('sosModal')">Cancel</button>
+      <button class="btn-primary" style="background:var(--rust)" onclick="triggerSOS()">🚨 Confirm SOS</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrModal">
+  <div class="modal" style="text-align:center">
+    <h3>📲 Share Care Circle QR</h3>
+    <p>Family members scan this with their phone camera. They'll be guided to create an account and instantly join Muhammad's care circle.</p>
+    <div style="background:var(--cream);border-radius:16px;padding:24px;display:inline-block;margin:8px 0 20px;">
+      <svg width="120" height="120" viewBox="0 0 66 66">
+        <rect x="4" y="4" width="26" height="26" rx="3" fill="none" stroke="#1C2B3A" stroke-width="2"/>
+        <rect x="10" y="10" width="14" height="14" rx="1" fill="#1C2B3A"/>
+        <rect x="36" y="4" width="26" height="26" rx="3" fill="none" stroke="#1C2B3A" stroke-width="2"/>
+        <rect x="42" y="10" width="14" height="14" rx="1" fill="#1C2B3A"/>
+        <rect x="4" y="36" width="26" height="26" rx="3" fill="none" stroke="#1C2B3A" stroke-width="2"/>
+        <rect x="10" y="42" width="14" height="14" rx="1" fill="#1C2B3A"/>
+        <rect x="36" y="36" width="6" height="6" fill="#1C2B3A"/>
+        <rect x="44" y="36" width="6" height="6" fill="#1C2B3A"/>
+        <rect x="52" y="36" width="10" height="6" fill="#1C2B3A"/>
+        <rect x="36" y="44" width="10" height="6" fill="#1C2B3A"/>
+        <rect x="50" y="44" width="12" height="6" fill="#1C2B3A"/>
+        <rect x="36" y="52" width="6" height="10" fill="#1C2B3A"/>
+        <rect x="46" y="52" width="16" height="6" fill="#1C2B3A"/>
+      </svg>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;">
+      <button class="btn-primary" onclick="showToast('📥 PDF downloading…');closeModal('qrModal')">↓ Download PDF card</button>
+      <button class="btn-ghost" onclick="showToast('🔗 Link copied!');closeModal('qrModal')">📋 Copy link</button>
+    </div>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn-ghost" onclick="closeModal('qrModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <span id="toastMsg">Action completed</span>
+</div>
+
+<script>
+// ── NAVIGATION ──────────────────────────────────────
+function navigate(pageId, navEl) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Deactivate nav items
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  // Show target page
+  const page = document.getElementById('page-' + pageId);
+  if (page) page.classList.add('active');
+  // Activate nav item
+  if (navEl) navEl.classList.add('active');
+  // Update topbar title
+  const titles = {
+    dashboard: 'Good morning, <span>Tariq</span> 👋',
+    activity: 'Activity <span>Log</span>',
+    medications: 'Medication <span>Manager</span>',
+    alerts: 'Alerts &amp; <span>Notifications</span>',
+    family: 'Family <span>Circle</span>',
+    messages: 'Voice <span>Messages</span>',
+    health: 'Health <span>Insights</span>',
+    settings: 'App <span>Settings</span>',
+  };
+  document.getElementById('topbarTitle').innerHTML = titles[pageId] || pageId;
+}
+
+// ── TOAST ───────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ── MODALS ──────────────────────────────────────────
+function openSOS()  { document.getElementById('sosModal').classList.add('open'); }
+function openQR()   { document.getElementById('qrModal').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function triggerSOS() {
+  closeModal('sosModal');
+  showToast('🚨 SOS activated — calling Muhammad and alerting family…');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ── ANIMATE HEALTH BARS ─────────────────────────────
+setTimeout(() => {
+  document.querySelectorAll('.hm-fill').forEach(bar => {
+    const w = bar.style.width;
+    bar.style.width = '0%';
+    setTimeout(() => bar.style.width = w, 100);
+  });
+}, 400);
+</script>
+</body>
+</html>
