@@ -4,9 +4,9 @@
 
 // Using Hostinger's WordPress database connection
 $db_host = '127.0.0.1';      // Usually localhost or 127.0.0.1
-$db_name = 'u200709086_yTzUe'; // Your database name
-$db_user = 'u200709086_yTzUe'; // Your database user (usually same as db_name on Hostinger)
-$db_pass = 'Lydra1234$';               // Your database password (get from Hostinger control panel)
+$db_name = 'aaaaa'; // Your database name
+$db_user = 'aaaaa'; // Your database user (usually same as db_name on Hostinger)
+$db_pass = 'aaaaa';               // Your database password (get from Hostinger control panel)
 
 try {
     $pdo = new PDO(
